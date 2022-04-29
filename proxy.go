@@ -24,7 +24,7 @@ type Module struct {
 // MaxVersion returns the highest version of the module.
 // if there is no version return a empty string
 // if pre is false, prerelease version will also exclude.
-func (m *Module) MaxVersion(prefix string, stable bool) (max string) {
+func (m *Module) maxVersion(prefix string, stable bool) (max string) {
 	for _, v := range m.Versions {
 		if !semver.IsValid(v) || !strings.HasPrefix(v, prefix) {
 			continue
@@ -57,13 +57,13 @@ func nextMajorVersion(version string) (next string, err error) {
 	return
 }
 
-func (m *Module) VersionPath(version string) string {
-	prefix := ModPrefix(m.Path)
-	return JoinPath(prefix, version, "")
+func (m *Module) versionPath(version string) string {
+	prefix := modPrefix(m.Path)
+	return joinPath(prefix, version, "")
 }
 
-func (m *Module) NextMajorPath() (string, bool) {
-	latest := m.MaxVersion("", true)
+func (m *Module) nextMajorPath() (string, bool) {
+	latest := m.maxVersion("", true)
 	if latest == "" {
 		return "", false
 	}
@@ -77,11 +77,11 @@ func (m *Module) NextMajorPath() (string, bool) {
 		return "", false
 	}
 
-	return m.VersionPath(next), true
+	return m.versionPath(next), true
 }
 
 // MakeModule will fetch versions from the proxy and return a Module.
-func Query(modp string, cached bool) (*Module, bool, error) {
+func query(modp string, cached bool) (*Module, bool, error) {
 	escaped, err := module.EscapePath(modp)
 	if err != nil {
 		return nil, false, err
@@ -139,7 +139,7 @@ func Query(modp string, cached bool) (*Module, bool, error) {
 }
 
 func Latest(modp string, cached bool) (*Module, error) {
-	latest, ok, err := Query(modp, cached)
+	latest, ok, err := query(modp, cached)
 	if err != nil {
 		return nil, err
 	}
@@ -149,22 +149,22 @@ func Latest(modp string, cached bool) (*Module, error) {
 	}
 
 	for i := 0; i < limit; i++ {
-		nextp, ok := latest.NextMajorPath()
+		nextp, ok := latest.nextMajorPath()
 		if !ok {
 			return latest, nil
 		}
 
-		next, ok, err := Query(nextp, cached)
+		next, ok, err := query(nextp, cached)
 		if err != nil {
 			return nil, err
 		}
 
 		if !ok {
-			version := latest.MaxVersion("", true)
+			version := latest.maxVersion("", true)
 			if semver.Build(version) == "+incompatible" {
-				nextp = latest.VersionPath((semver.Major(version)))
+				nextp = latest.versionPath((semver.Major(version)))
 				if nextp != latest.Path {
-					next, ok, err = Query(nextp, cached)
+					next, ok, err = query(nextp, cached)
 					if err != nil {
 						return nil, err
 					}
@@ -184,17 +184,17 @@ func QueryPkg(pkgpath string, cached bool) (*Module, error) {
 	prefix := pkgpath
 	for prefix != "" {
 		if module.CheckPath(prefix) == nil {
-			mod, ok, err := Query(prefix, cached)
+			mod, ok, err := query(prefix, cached)
 			if err != nil {
 				return nil, err
 			}
 
 			if ok {
-				modprefix := ModPrefix(mod.Path)
-				if modpath, pkgdir, ok := SplitPath(modprefix, pkgpath); ok && modpath != mod.Path {
-					if major, ok := ModMajor(modpath); ok {
-						if v := mod.MaxVersion(major, false); v != "" {
-							spec := JoinPath(modprefix, "", pkgdir) + "@" + v
+				modprefix := modPrefix(mod.Path)
+				if modpath, pkgdir, ok := splitPath(modprefix, pkgpath); ok && modpath != mod.Path {
+					if major, ok := modMajor(modpath); ok {
+						if v := mod.maxVersion(major, false); v != "" {
+							spec := joinPath(modprefix, "", pkgdir) + "@" + v
 							return nil, fmt.Errorf("%s is not in %s", pkgpath, spec)
 						}
 						return nil, fmt.Errorf("failed to find %s in %s", pkgpath, modprefix)

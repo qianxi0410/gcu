@@ -11,7 +11,7 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-func ModPrefix(modp string) string {
+func modPrefix(modp string) string {
 	prefix, _, ok := module.SplitPathVersion(modp)
 	if !ok {
 		prefix = modp
@@ -20,10 +20,10 @@ func ModPrefix(modp string) string {
 	return prefix
 }
 
-// ModMajaro return the major mod of the given mod
+// modMajaro return the major mod of the given mod
 // like: vX.Y.Z -> vX; X >= 2
 // will return empty string if the given mod is not a valid mod.
-func ModMajor(modp string) (string, bool) {
+func modMajor(modp string) (string, bool) {
 	_, major, ok := module.SplitPathVersion(modp)
 	if ok {
 		major = strings.TrimPrefix(major, "/")
@@ -33,8 +33,8 @@ func ModMajor(modp string) (string, bool) {
 	return major, ok
 }
 
-// JoinPath create a full pkg path.
-func JoinPath(modprefix, version, pkgdir string) string {
+// joinPath create a full pkg path.
+func joinPath(modprefix, version, pkgdir string) string {
 	version = strings.TrimPrefix(version, ".")
 	version = strings.TrimPrefix(version, "/")
 
@@ -58,7 +58,7 @@ func JoinPath(modprefix, version, pkgdir string) string {
 }
 
 // SplitPath split the pkgpath to the modpath and pkgdir.
-func SplitPath(modprefix, pkgpath string) (modpath, pkgdir string, ok bool) {
+func splitPath(modprefix, pkgpath string) (modpath, pkgdir string, ok bool) {
 	if !strings.HasPrefix(pkgpath, modprefix) {
 		return
 	}
@@ -75,17 +75,17 @@ func SplitPath(modprefix, pkgpath string) (modpath, pkgdir string, ok bool) {
 	}
 
 	modpath = modprefix
-	if major, ok := ModMajor(pkgpath[:modpathLen]); ok {
-		modpath = JoinPath(modprefix, major, "")
+	if major, ok := modMajor(pkgpath[:modpathLen]); ok {
+		modpath = joinPath(modprefix, major, "")
 	}
 	pkgdir = strings.TrimPrefix(pkgpath[len(modpath):], "/")
 
 	return modpath, pkgdir, true
 }
 
-// FindModFile recursively search the given path for a go.mod file.
+// findModFile recursively search the given path for a go.mod file.
 // only search up.
-func FindModFile(dir string) (path string, err error) {
+func findModFile(dir string) (path string, err error) {
 	if dir, err = filepath.Abs(dir); err != nil {
 		return "", err
 	}
@@ -110,9 +110,9 @@ func FindModFile(dir string) (path string, err error) {
 	return "", os.ErrNotExist
 }
 
-// Direct returns the direct module deps.
-func Direct(dir string) ([]module.Version, error) {
-	name, err := FindModFile(dir)
+// direct returns the direct module deps.
+func direct(dir string) ([]module.Version, error) {
+	name, err := findModFile(dir)
 	if err != nil {
 		return nil, err
 	}

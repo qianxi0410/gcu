@@ -6,9 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestModPrefix(t *testing.T) {
-}
-
 func TestJoinPath(t *testing.T) {
 	tests := []struct {
 		modprefix string
@@ -86,7 +83,7 @@ func TestJoinPath(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
-			got := JoinPath(tt.modprefix, tt.version, tt.pkgdir)
+			got := joinPath(tt.modprefix, tt.version, tt.pkgdir)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -125,7 +122,7 @@ func TestModMajor(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
-			got, ok := ModMajor(tt.modp)
+			got, ok := modMajor(tt.modp)
 			assert.True(t, ok)
 			assert.Equal(t, tt.want, got)
 		})
@@ -172,7 +169,7 @@ func TestSplitPath(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.modpath, func(t *testing.T) {
-			modpath, pkgdir, ok := SplitPath(tt.modprefix, tt.pkgpath)
+			modpath, pkgdir, ok := splitPath(tt.modprefix, tt.pkgpath)
 			assert.Equal(t, tt.ok, ok)
 			assert.Equal(t, tt.modpath, modpath)
 			assert.Equal(t, tt.pkgdir, pkgdir)
@@ -181,7 +178,7 @@ func TestSplitPath(t *testing.T) {
 }
 
 func TestDirect(t *testing.T) {
-	mods, _ := Direct(".")
+	mods, _ := direct(".")
 	for _, m := range mods {
 		t.Logf("%s", m)
 	}

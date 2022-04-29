@@ -16,18 +16,18 @@ func TestLatest(t *testing.T) {
 		t.Run(test, func(t *testing.T) {
 			mod, err := Latest(test, true)
 			assert.Nil(t, err)
-			t.Logf("Latest: %s, %v", mod.Path, mod.MaxVersion("", true))
+			t.Logf("Latest: %s, %v", mod.Path, mod.maxVersion("", true))
 		})
 	}
 }
 
 func TestQuery(t *testing.T) {
-	mod, ok, err := Query("github.com/go-redis/redis", true)
+	mod, ok, err := query("github.com/go-redis/redis", true)
 	assert.Nil(t, err)
 	assert.True(t, ok)
-	t.Logf("Query: %s, %v", mod.Path, mod.MaxVersion("", true))
+	t.Logf("query: %s, %v", mod.Path, mod.maxVersion("", true))
 
-	mod, ok, err = Query("github.com/labstack/echo/v5", true)
+	mod, ok, err = query("github.com/labstack/echo/v5", true)
 	assert.Nil(t, err)
 	assert.False(t, ok)
 }
