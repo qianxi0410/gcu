@@ -14,7 +14,7 @@ func TestLatest(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test, func(t *testing.T) {
-			mod, err := Latest(test, true)
+			mod, err := latest(test, true)
 			assert.Nil(t, err)
 			t.Logf("Latest: %s, %v", mod.Path, mod.maxVersion("", true))
 		})
@@ -48,7 +48,7 @@ func TestQueryPkg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.pkgpath, func(t *testing.T) {
-			mod, err := QueryPkg(tt.pkgpath, true)
+			mod, err := queryPkg(tt.pkgpath, true)
 			assert.Nil(t, err)
 			assert.Equal(t, tt.modpath, mod.Path)
 		})

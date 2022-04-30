@@ -138,7 +138,7 @@ func query(modp string, cached bool) (*Module, bool, error) {
 	return mod, true, nil
 }
 
-func Latest(modp string, cached bool) (*Module, error) {
+func latest(modp string, cached bool) (*Module, error) {
 	latest, ok, err := query(modp, cached)
 	if err != nil {
 		return nil, err
@@ -180,7 +180,7 @@ func Latest(modp string, cached bool) (*Module, error) {
 	return nil, fmt.Errorf("request too many times")
 }
 
-func QueryPkg(pkgpath string, cached bool) (*Module, error) {
+func queryPkg(pkgpath string, cached bool) (*Module, error) {
 	prefix := pkgpath
 	for prefix != "" {
 		if module.CheckPath(prefix) == nil {
