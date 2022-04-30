@@ -19,6 +19,11 @@ func diff(v1, v2 string) bool {
 	return semver.Compare(v1, v2) != 0
 }
 
+// oldversion
+func (v *version) oldversion() string {
+	return v.old[:len(v.old)-len(semver.Build(v.old))]
+}
+
 // colorful print new version's diffent part.
 func (v *version) newVersion() string {
 	major, minor, patch, pre := color.New(color.FgWhite).SprintFunc(), color.New(color.FgWhite).SprintFunc(), color.New(color.FgWhite).SprintFunc(), color.New(color.FgWhite).SprintFunc()

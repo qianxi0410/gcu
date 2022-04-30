@@ -11,6 +11,8 @@ import (
 	"golang.org/x/mod/semver"
 )
 
+// split returns the module path and the version
+// e.g. "github.com/qianxi0410/errnil/v10" => "github.com/qianxi0410/errnil"
 func modPrefix(modp string) string {
 	prefix, _, ok := module.SplitPathVersion(modp)
 	if !ok {
@@ -135,4 +137,16 @@ func direct(dir string) ([]module.Version, error) {
 	}
 
 	return mods, nil
+}
+
+func splitSpec(spec string) (path, query string) {
+	parts := strings.SplitN(spec, "@", 2)
+	if len(parts) == 2 {
+		path = parts[0]
+		query = parts[1]
+	} else {
+		path = spec
+	}
+
+	return
 }
