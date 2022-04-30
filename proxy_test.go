@@ -6,6 +6,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestModPrefix(t *testing.T) {
+	tests := []struct {
+		modpath string
+		prefix  string
+	}{
+		{
+			"github.com/go-redis/redis/v6",
+			"github.com/go-redis/redis",
+		},
+		{
+			"github.com/go-redis/redis/v9",
+			"github.com/go-redis/redis",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.modpath, func(t *testing.T) {
+			assert.Equal(t, tt.prefix, modPrefix(tt.modpath))
+		})
+	}
+}
+
 func TestLatest(t *testing.T) {
 	tests := []string{
 		"github.com/go-redis/redis",

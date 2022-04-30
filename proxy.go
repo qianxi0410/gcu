@@ -23,14 +23,14 @@ type Module struct {
 
 // MaxVersion returns the highest version of the module.
 // if there is no version return a empty string
-// if pre is false, prerelease version will also exclude.
+// if stable is true, prerelease version will also exclude.
 func (m *Module) maxVersion(prefix string, stable bool) (max string) {
 	for _, v := range m.Versions {
 		if !semver.IsValid(v) || !strings.HasPrefix(v, prefix) {
 			continue
 		}
 
-		if !stable && semver.Prerelease(v) != "" {
+		if stable && semver.Prerelease(v) != "" {
 			continue
 		}
 
