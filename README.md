@@ -1,0 +1,2 @@
+# gcu (go check updates)
+
