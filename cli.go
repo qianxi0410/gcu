@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/urfave/cli/v2"
 )
 
@@ -75,11 +75,17 @@ func listCmd(ctx *cli.Context) error {
 	if len(versions) == 0 {
 		c := color.New(color.FgCyan, color.Bold)
 		c.Println("🎉 All the latest dependencies!")
+		return nil
 	}
 
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"lib", "current version", "latest version"})
 	for _, v := range versions {
-		fmt.Printf("%s\t %s\t %s\n", v.path, v.oldversion(), v.newVersion())
+		t.AppendRow(table.Row{v.path, v.oldversion(), v.newVersion()})
 	}
+
+	t.Render()
 
 	return nil
 }
