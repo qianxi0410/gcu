@@ -62,26 +62,9 @@ func main() {
 }
 
 func listCmd(ctx *cli.Context) error {
-	deps, err := direct(ctx.String("modfile"))
+	versions, err := getVersions(*ctx)
 	if err != nil {
 		return err
-	}
-
-	versions := make([]version, 0, len(deps))
-
-	for _, dep := range deps {
-		mod, err := latest(dep.Path, ctx.Bool("cached"))
-		if err != nil {
-			return err
-		}
-		old, new := dep.Version, mod.maxVersion("", ctx.Bool("stable"))
-		if diff(old, new) {
-			versions = append(versions, version{
-				path: modPrefix(mod.Path),
-				old:  old,
-				new:  new,
-			})
-		}
 	}
 
 	if len(versions) == 0 {
@@ -103,26 +86,9 @@ func listCmd(ctx *cli.Context) error {
 }
 
 func gcuCmd(ctx *cli.Context) error {
-	deps, err := direct(ctx.String("modfile"))
+	versions, err := getVersions(*ctx)
 	if err != nil {
 		return err
-	}
-
-	versions := make([]version, 0, len(deps))
-
-	for _, dep := range deps {
-		mod, err := latest(dep.Path, ctx.Bool("cached"))
-		if err != nil {
-			return err
-		}
-		old, new := dep.Version, mod.maxVersion("", ctx.Bool("stable"))
-		if diff(old, new) {
-			versions = append(versions, version{
-				path: modPrefix(mod.Path),
-				old:  old,
-				new:  new,
-			})
-		}
 	}
 
 	if len(versions) == 0 {

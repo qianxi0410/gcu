@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os/exec"
 	"regexp"
 
 	"github.com/fatih/color"
+	"github.com/urfave/cli/v2"
 	"golang.org/x/mod/semver"
 )
 
@@ -50,4 +52,53 @@ func (v *version) newVersion() string {
 
 func (v *version) String() string {
 	return fmt.Sprintf("%s %s -> %s", v.path, v.oldversion(), v.newVersion())
+}
+
+func getVersions(ctx cli.Context) ([]version, error) {
+	deps, err := direct(ctx.String("modfile"))
+	if err != nil {
+		return nil, err
+	}
+
+	versions := make([]version, 0, len(deps))
+
+	pattern := regexp.MustCompile(`v[\d]+.0.0-[\d]{14}-[\d\s\S]{12}`)
+
+	output, err := exec.Command("go", "list", "-m", "-u", "all").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, dep := range deps {
+		if pattern.MatchString(dep.Version) {
+			old := dep.Version
+			extractPattern := regexp.MustCompile(dep.Path + ` v[\d]+.0.0-[\d]{14}-[\d\s\S]{12} \[(.*)\]`)
+			result := extractPattern.FindStringSubmatch(string(output))
+			fmt.Println(result)
+			if len(result) != 2 {
+				continue
+			}
+			new := result[1]
+			versions = append(versions, version{
+				path: modPrefix(dep.Path),
+				old:  old,
+				new:  new,
+			})
+		} else {
+			mod, err := latest(dep.Path, ctx.Bool("cached"))
+			if err != nil {
+				return nil, err
+			}
+			old, new := dep.Version, mod.maxVersion("", ctx.Bool("stable"))
+			if diff(old, new) {
+				versions = append(versions, version{
+					path: modPrefix(mod.Path),
+					old:  old,
+					new:  new,
+				})
+			}
+		}
+	}
+
+	return versions, nil
 }

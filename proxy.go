@@ -128,6 +128,9 @@ func query(modp string, cached bool) (*Module, bool, error) {
 
 	sc := bufio.NewScanner(res.Body)
 	for sc.Scan() {
+		if len(strings.TrimSpace(sc.Text())) == 0 {
+			continue
+		}
 		mod.Versions = append(mod.Versions, sc.Text())
 	}
 
