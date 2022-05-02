@@ -11,6 +11,8 @@ But this tool makes up for these deficiencies.
 
 warning:
 
+- Will only check directly dependent libraries
+- If there is a mutual dependency between two directly dependent libraries, unless both libraries depend on each other's latest library, there will be strange behavior
 - You need to ensure your own compatibility after updating major versions
 - If the major version of the library is discontinuous, the latest version may not be available (e.g. 1.0.0 -> 3.1.0 without v2)
 - Still Work In Progress
