@@ -124,12 +124,23 @@ func upgrade(modp, v, dir string, r bool) error {
 		return nil
 	}
 	// rewrite import path
-	return rewrite(dir, func(_ token.Position, path string) (string, error) {
+	err := rewrite(dir, func(_ token.Position, path string) (string, error) {
 		_, pkgdir, ok := splitPath(modp, path)
 		if !ok {
 			return "", filepath.SkipDir
 		}
 		newp := joinPath(modp, v, pkgdir)
+
 		return newp, nil
 	})
+	if err != nil {
+		return err
+	}
+
+	// after rewrite, we need to run go mod tidy to make sure go.mod is valid.
+	if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
+		return err
+	}
+
+	return nil
 }
