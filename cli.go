@@ -115,7 +115,7 @@ func gcuCmd(ctx *cli.Context) error {
 		options = append(options, v.String())
 	}
 
-	idxs := []int{}
+	idxs := make([]int, 0, len(options))
 	prompt := &survey.MultiSelect{
 		Message:  "Select the dependencies you need to upgrade:",
 		Options:  options,

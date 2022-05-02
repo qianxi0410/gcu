@@ -74,7 +74,6 @@ func getVersions(ctx cli.Context) ([]version, error) {
 			old := dep.Version
 			extractPattern := regexp.MustCompile(dep.Path + ` v[\d]+.0.0-[\d]{14}-[\d\s\S]{12} \[(.*)\]`)
 			result := extractPattern.FindStringSubmatch(string(output))
-			fmt.Println(result)
 			if len(result) != 2 {
 				continue
 			}
