@@ -47,3 +47,7 @@ func (v *version) newVersion() string {
 
 	return fmt.Sprintf("%s.%s.%s%s", major(news[1]), minor(news[2]), patch(news[3]), pre(news[4]))
 }
+
+func (v *version) String() string {
+	return fmt.Sprintf("%s %s -> %s", v.path, v.oldversion(), v.newVersion())
+}

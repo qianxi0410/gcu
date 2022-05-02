@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"io/fs"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -108,4 +110,26 @@ func rewriteFile(name string, replace replaceFunc) error {
 	}
 
 	return os.Rename(tmp, name)
+}
+
+func upgrade(modp, v, dir string, r bool) error {
+	newp := joinPath(modp, v, "")
+
+	// use go mod edit to update go.mod
+	if err := exec.Command("go", "get", "-u", fmt.Sprintf("%s@%s", newp, v)).Run(); err != nil {
+		return err
+	}
+
+	if !r {
+		return nil
+	}
+	// rewrite import path
+	return rewrite(dir, func(_ token.Position, path string) (string, error) {
+		_, pkgdir, ok := splitPath(modp, path)
+		if !ok {
+			return "", filepath.SkipDir
+		}
+		newp := joinPath(modp, v, pkgdir)
+		return newp, nil
+	})
 }
