@@ -17,32 +17,37 @@ func main() {
 			&cli.StringFlag{
 				Name:    "modfile",
 				Aliases: []string{"m"},
-				Usage:   "Path to go.mod file",
+				Usage:   "Path to go.mod file.",
 				Value:   ".",
 			},
 			&cli.BoolFlag{
 				Name:    "stable",
 				Aliases: []string{"s"},
-				Usage:   "Only fetch stable version",
+				Usage:   "Only fetch stable version.",
 				Value:   true,
 			},
 			&cli.BoolFlag{
 				Name:    "cached",
 				Aliases: []string{"c"},
-				Usage:   "Use cached version if available",
+				Usage:   "Use cached version if available.",
 				Value:   false,
 			},
 			&cli.BoolFlag{
 				Name:    "all",
 				Aliases: []string{"a"},
-				Usage:   "Upgrade all dependencies without asking",
+				Usage:   "Upgrade all dependencies without asking.",
 				Value:   false,
 			},
 			&cli.BoolFlag{
 				Name:    "rewrite",
 				Aliases: []string{"w"},
-				Usage:   "Rewrite all dependencies to latest version in your project",
+				Usage:   "Rewrite all dependencies to latest version in your project.",
 				Value:   true,
+			},
+			&cli.BoolFlag{
+				Name:  "safe",
+				Usage: "Only minor and patch releases are checked and updated.",
+				Value: false,
 			},
 		},
 		Commands: []*cli.Command{
@@ -113,7 +118,7 @@ func gcuCmd(ctx *cli.Context) error {
 
 	idxs := make([]int, 0, len(options))
 	prompt := &survey.MultiSelect{
-		Message:  "Select the dependencies you need to upgrade:",
+		Message:  "Select the dependencies you need to upgrade: ",
 		Options:  options,
 		PageSize: 10,
 	}
@@ -122,7 +127,7 @@ func gcuCmd(ctx *cli.Context) error {
 	}
 
 	for _, idx := range idxs {
-		if err := upgrade(versions[idx].path, versions[idx].new, ctx.String("modfile"), ctx.Bool("rewrite")); err != nil {
+		if err := upgrade(versions[idx].path, versions[idx].new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe")); err != nil {
 			return err
 		}
 	}

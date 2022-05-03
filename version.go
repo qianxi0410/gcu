@@ -62,17 +62,36 @@ func getVersions(ctx cli.Context) ([]version, error) {
 
 	versions := make([]version, 0, len(deps))
 
-	pattern := regexp.MustCompile(`v[\d]+.0.0-[\d]{14}-[\d\s\S]{12}`)
+	pattern := regexp.MustCompile(`v0.0.0-[\d]{14}-[\d\s\S]{12}`)
 
-	output, err := exec.Command("go", "list", "-m", "-u", "all").Output()
+	output, err := exec.Command("go", "list", "-u",
+		"-f", "'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: [{{.Version}}] [{{.Update.Version}}]{{end}}'",
+		"-m", "all").Output()
 	if err != nil {
 		return nil, err
 	}
 
 	for _, dep := range deps {
+		if ctx.Bool("safe") {
+			old := dep.Version
+			extractPattern := regexp.MustCompile(dep.Path + `: \[.*]\ \[(.*)\]`)
+			result := extractPattern.FindStringSubmatch(string(output))
+			if len(result) != 2 {
+				continue
+			}
+			new := result[1]
+			versions = append(versions, version{
+				path: modPrefix(dep.Path),
+				old:  old,
+				new:  new,
+			})
+
+			continue
+		}
+
 		if pattern.MatchString(dep.Version) {
 			old := dep.Version
-			extractPattern := regexp.MustCompile(dep.Path + ` v[\d]+.0.0-[\d]{14}-[\d\s\S]{12} \[(.*)\]`)
+			extractPattern := regexp.MustCompile(dep.Path + `: \[v0.0.0-[\s\S\d\.]*[\d]{14}-[\d\s\S]{12}\] \[(.*)\]`)
 			result := extractPattern.FindStringSubmatch(string(output))
 			if len(result) != 2 {
 				continue
