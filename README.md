@@ -4,7 +4,7 @@ Due to following the [semantic version number](https://semver.org/), Go will not
 
 But this tool makes up for these deficiencies.
 
-- It provides update checking for major versions
+- It provides update checking for major versions (you can add the `--safe` flag to ignore major version checks)
 - Visual update selection
 - Colored version number distinguishing hints
 - Automatically rewrite import paths (default)
