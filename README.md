@@ -31,10 +31,11 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --modfile value, -m value  Path to go.mod file (default: ".")
-   --stable, -s               Only fetch stable version (default: true)
-   --cached, -c               Use cached version if available (default: false)
-   --all, -a                  Upgrade all dependencies without asking (default: false)
-   --rewrite, -w              Rewrite all dependencies to latest version in your project (default: true)
+   --modfile value, -m value  Path to go.mod file. (default: ".")
+   --stable, -s               Only fetch stable version. (default: true)
+   --cached, -c               Use cached version if available. (default: false)
+   --all, -a                  Upgrade all dependencies without asking. (default: false)
+   --rewrite, -w              Rewrite all dependencies to latest version in your project. (default: true)
+   --safe                     Only minor and patch releases are checked and updated. (default: false)
    --help, -h                 show help (default: false)
 ```
