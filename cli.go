@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/urfave/cli/v2"
 )
@@ -68,8 +67,7 @@ func listCmd(ctx *cli.Context) error {
 	}
 
 	if len(versions) == 0 {
-		c := color.New(color.FgCyan, color.Bold)
-		c.Println("🎉 All the latest dependencies!")
+		printAllDepLatest()
 		return nil
 	}
 
@@ -92,8 +90,7 @@ func gcuCmd(ctx *cli.Context) error {
 	}
 
 	if len(versions) == 0 {
-		c := color.New(color.FgCyan, color.Bold)
-		c.Println("🎉 All the latest dependencies!")
+		printAllDepLatest()
 		return nil
 	}
 
@@ -104,8 +101,7 @@ func gcuCmd(ctx *cli.Context) error {
 			}
 		}
 
-		c := color.New(color.FgGreen, color.Bold)
-		c.Println("🎉 All the latest dependencies!")
+		printAllDepLatest()
 		return nil
 	}
 
@@ -130,8 +126,7 @@ func gcuCmd(ctx *cli.Context) error {
 			return err
 		}
 	}
-	c := color.New(color.FgGreen, color.Bold)
-	c.Println("🎉 All the latest dependencies!")
+	printAllDepLatest()
 
 	return nil
 }
