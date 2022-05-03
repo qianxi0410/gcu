@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/mod/semver"
@@ -55,6 +57,15 @@ func (v *version) String() string {
 }
 
 func getVersions(ctx cli.Context) ([]version, error) {
+	s := spinner.New(spinner.CharSets[36], 100*time.Millisecond)
+	s.Prefix = "Checking... Please wait."
+	if err := s.Color("cyan"); err != nil {
+		return nil, err
+	}
+
+	s.Start()
+	defer s.Stop()
+
 	deps, err := direct(ctx.String("modfile"))
 	if err != nil {
 		return nil, err
