@@ -52,6 +52,11 @@ func main() {
 				Usage: "Only minor and patch releases are checked and updated.",
 				Value: false,
 			},
+			&cli.IntFlag{
+				Name:  "size",
+				Usage: "Number of items to show in the select list.",
+				Value: 10,
+			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -111,11 +116,19 @@ func gcuCmd(ctx *cli.Context) error {
 	}
 
 	if ctx.Bool("all") {
+		s := spinner.New(spinner.CharSets[0], 100*time.Millisecond)
+		s.Prefix = "Updating... Please wait."
+		if err := s.Color("cyan"); err != nil {
+			return err
+		}
+
+		s.Start()
 		for _, v := range versions {
 			if err := upgrade(v.path, v.new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe")); err != nil {
 				return err
 			}
 		}
+		s.Stop()
 
 		printAllDepLatest()
 		return nil
@@ -135,7 +148,7 @@ func gcuCmd(ctx *cli.Context) error {
 		survey.MultiSelect{
 			Message:  "Select the dependencies you need to upgrade: ",
 			Options:  options,
-			PageSize: 10,
+			PageSize: ctx.Int("size"),
 		},
 	}
 	err = survey.AskOne(prompt, &idxs)
@@ -159,7 +172,7 @@ func gcuCmd(ctx *cli.Context) error {
 		}
 	}
 	s.Stop()
-	printAllDepLatest()
+	printPartDepLatest()
 
 	return nil
 }
