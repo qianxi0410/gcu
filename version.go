@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"sync"
 	"time"
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/mod/module"
 	"golang.org/x/mod/semver"
 )
 
@@ -66,6 +68,11 @@ func getVersions(ctx cli.Context) ([]version, error) {
 	s.Start()
 	defer s.Stop()
 
+	// accelerate the process.
+	wg := &sync.WaitGroup{}
+	wgCmd := &sync.WaitGroup{}
+	mu := &sync.Mutex{}
+
 	deps, err := direct(ctx.String("modfile"))
 	if err != nil {
 		return nil, err
@@ -74,60 +81,83 @@ func getVersions(ctx cli.Context) ([]version, error) {
 	versions := make([]version, 0, len(deps))
 
 	pattern := regexp.MustCompile(`v0.0.0-[\d]{14}-[\d\s\S]{12}`)
+	output := []byte{}
 
-	output, err := exec.Command("go", "list", "-u",
-		"-f", "'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: [{{.Version}}] [{{.Update.Version}}]{{end}}'",
-		"-m", "all").Output()
+	wgCmd.Add(1)
+	go func() {
+		defer wgCmd.Done()
+		output, _ = exec.Command("go", "list", "-u",
+			"-f", "'{{if (and (not (or .Main .Indirect)) .Update)}}{{.Path}}: [{{.Version}}] [{{.Update.Version}}]{{end}}'",
+			"-m", "all").Output()
+	}()
 	if err != nil {
 		return nil, err
 	}
 
+	wg.Add(len(deps))
+
 	for _, dep := range deps {
-		if ctx.Bool("safe") {
-			old := dep.Version
-			extractPattern := regexp.MustCompile(dep.Path + `: \[.*]\ \[(.*)\]`)
-			result := extractPattern.FindStringSubmatch(string(output))
-			if len(result) != 2 {
-				continue
-			}
-			new := result[1]
-			versions = append(versions, version{
-				path: modPrefix(dep.Path),
-				old:  old,
-				new:  new,
-			})
+		go func(dep module.Version) {
+			defer wg.Done()
 
-			continue
-		}
+			if ctx.Bool("safe") {
+				wgCmd.Wait()
 
-		if pattern.MatchString(dep.Version) {
-			old := dep.Version
-			extractPattern := regexp.MustCompile(dep.Path + `: \[v0.0.0-[\s\S\d\.]*[\d]{14}-[\d\s\S]{12}\] \[(.*)\]`)
-			result := extractPattern.FindStringSubmatch(string(output))
-			if len(result) != 2 {
-				continue
-			}
-			new := result[1]
-			versions = append(versions, version{
-				path: modPrefix(dep.Path),
-				old:  old,
-				new:  new,
-			})
-		} else {
-			mod, err := latest(dep.Path, ctx.Bool("cached"))
-			if err != nil {
-				return nil, err
-			}
-			old, new := dep.Version, mod.maxVersion("", ctx.Bool("stable"))
-			if diff(old, new) {
+				old := dep.Version
+				extractPattern := regexp.MustCompile(dep.Path + `: \[.*]\ \[(.*)\]`)
+				result := extractPattern.FindStringSubmatch(string(output))
+				if len(result) != 2 {
+					return
+				}
+				new := result[1]
+				mu.Lock()
 				versions = append(versions, version{
-					path: modPrefix(mod.Path),
+					path: modPrefix(dep.Path),
 					old:  old,
 					new:  new,
 				})
+				mu.Unlock()
+
+				return
 			}
-		}
+
+			if pattern.MatchString(dep.Version) {
+				wgCmd.Wait()
+
+				old := dep.Version
+				extractPattern := regexp.MustCompile(dep.Path + `: \[v0.0.0-[\s\S\d\.]*[\d]{14}-[\d\s\S]{12}\] \[(.*)\]`)
+				result := extractPattern.FindStringSubmatch(string(output))
+				if len(result) != 2 {
+					return
+				}
+				new := result[1]
+				mu.Lock()
+				versions = append(versions, version{
+					path: modPrefix(dep.Path),
+					old:  old,
+					new:  new,
+				})
+				mu.Unlock()
+			} else {
+				mod, err := latest(dep.Path, ctx.Bool("cached"))
+				if err != nil {
+					return
+				}
+				old, new := dep.Version, mod.maxVersion("", ctx.Bool("stable"))
+				if diff(old, new) {
+					mu.Lock()
+					versions = append(versions, version{
+						path: modPrefix(mod.Path),
+						old:  old,
+						new:  new,
+					})
+					mu.Unlock()
+				}
+			}
+		}(dep)
 	}
+
+	wg.Wait()
 
 	return versions, nil
 }
