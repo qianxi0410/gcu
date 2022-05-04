@@ -81,7 +81,7 @@ func getVersions(ctx cli.Context) ([]version, error) {
 
 	versions := make([]version, 0, len(deps))
 
-	pattern := regexp.MustCompile(`v0.0.0-[\d]{14}-[\d\s\S]{12}`)
+	pattern := regexp.MustCompile(`v0.0.0-.+`)
 	output := []byte{}
 
 	wgCmd.Add(1)
@@ -100,8 +100,7 @@ func getVersions(ctx cli.Context) ([]version, error) {
 	for _, dep := range deps {
 		go func(dep module.Version) {
 			defer wg.Done()
-
-			if ctx.Bool("safe") {
+			if ctx.Bool("safe") || pattern.MatchString(dep.Version) {
 				wgCmd.Wait()
 
 				old := dep.Version
@@ -122,38 +121,19 @@ func getVersions(ctx cli.Context) ([]version, error) {
 				return
 			}
 
-			if pattern.MatchString(dep.Version) {
-				wgCmd.Wait()
-
-				old := dep.Version
-				extractPattern := regexp.MustCompile(dep.Path + `: \[v0.0.0-[\s\S\d\.]*[\d]{14}-[\d\s\S]{12}\] \[(.*)\]`)
-				result := extractPattern.FindStringSubmatch(string(output))
-				if len(result) != 2 {
-					return
-				}
-				new := result[1]
+			mod, err := latest(dep.Path, ctx.Bool("cached"))
+			if err != nil {
+				return
+			}
+			old, new := dep.Version, mod.maxVersion("", ctx.Bool("stable"))
+			if diff(old, new) {
 				mu.Lock()
 				versions = append(versions, version{
-					path: modPrefix(dep.Path),
+					path: modPrefix(mod.Path),
 					old:  old,
 					new:  new,
 				})
 				mu.Unlock()
-			} else {
-				mod, err := latest(dep.Path, ctx.Bool("cached"))
-				if err != nil {
-					return
-				}
-				old, new := dep.Version, mod.maxVersion("", ctx.Bool("stable"))
-				if diff(old, new) {
-					mu.Lock()
-					versions = append(versions, version{
-						path: modPrefix(mod.Path),
-						old:  old,
-						new:  new,
-					})
-					mu.Unlock()
-				}
 			}
 		}(dep)
 	}
