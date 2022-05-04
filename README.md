@@ -17,6 +17,12 @@ warning:
 - If the major version of the library is discontinuous, the latest version may not be available (e.g. 1.0.0 -> 3.1.0 without v2)
 - Still Work In Progress
 
+download:
+
+```bash
+go install github.com/qianxi0410/gcu@latest
+```
+
 ```bash
 > gcu help
 
@@ -37,5 +43,6 @@ GLOBAL OPTIONS:
    --all, -a                  Upgrade all dependencies without asking. (default: false)
    --rewrite, -w              Rewrite all dependencies to latest version in your project. (default: true)
    --safe                     Only minor and patch releases are checked and updated. (default: false)
+   --size value               Number of items to show in the select list. (default: 10)
    --help, -h                 show help (default: false)
 ```
