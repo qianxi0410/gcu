@@ -54,8 +54,9 @@ func (v *version) newVersion() string {
 	return fmt.Sprintf("%s.%s.%s%s", major(news[1]), minor(news[2]), patch(news[3]), pre(news[4]))
 }
 
-func (v *version) String() string {
-	return fmt.Sprintf("%s %s -> %s", v.path, v.oldversion(), v.newVersion())
+func (v *version) String(m1, m2, m3 int) string {
+	format := fmt.Sprintf("%%-%ds %%-%ds %%-%ds", m1, m2, m3)
+	return fmt.Sprintf(format, v.path, v.oldversion(), v.newVersion())
 }
 
 func getVersions(ctx cli.Context) ([]version, error) {

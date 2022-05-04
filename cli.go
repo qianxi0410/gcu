@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/terminal"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/urfave/cli/v2"
 )
@@ -88,6 +89,14 @@ func listCmd(ctx *cli.Context) error {
 	return nil
 }
 
+type MultiSelect struct {
+	survey.MultiSelect
+}
+
+func (m MultiSelect) Cleanup(config *survey.PromptConfig, val interface{}) error {
+	return m.Render("", nil)
+}
+
 func gcuCmd(ctx *cli.Context) error {
 	versions, err := getVersions(*ctx)
 	if err != nil {
@@ -111,18 +120,27 @@ func gcuCmd(ctx *cli.Context) error {
 	}
 
 	options := make([]string, 0, len(versions))
+	m1, m2, m3 := caculateMaxLenForEachItem(versions)
 
 	for _, v := range versions {
-		options = append(options, v.String())
+		options = append(options, v.String(m1, m2, m3))
 	}
 
 	idxs := make([]int, 0, len(options))
-	prompt := &survey.MultiSelect{
-		Message:  "Select the dependencies you need to upgrade: ",
-		Options:  options,
-		PageSize: 10,
+
+	// disable MultiSelect answer output.
+	prompt := &MultiSelect{
+		survey.MultiSelect{
+			Message:  "Select the dependencies you need to upgrade: ",
+			Options:  options,
+			PageSize: 10,
+		},
 	}
-	if err := survey.AskOne(prompt, &idxs, survey.WithPageSize(10)); err != nil {
+	err = survey.AskOne(prompt, &idxs)
+	if err == terminal.InterruptErr {
+		printBye()
+		os.Exit(0)
+	} else if err != nil {
 		return err
 	}
 
