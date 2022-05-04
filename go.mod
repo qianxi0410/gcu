@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.4
+	github.com/briandowns/spinner v1.18.1
 	github.com/fatih/color v1.13.0
 	github.com/jedib0t/go-pretty/v6 v6.3.1
 	github.com/stretchr/testify v1.7.1
@@ -18,7 +19,6 @@ require (
 )
 
 require (
-	github.com/briandowns/spinner v1.18.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
