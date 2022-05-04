@@ -120,7 +120,12 @@ func upgrade(modp, v, dir string, r bool) error {
 		return err
 	}
 
-	if !r {
+	major, ok := modMajor(newp)
+	if !ok {
+		return fmt.Errorf("%s: failed to get major version", newp)
+	}
+
+	if !r || major == "v0" || major == "v1" || strings.Contains(v, "+incompatible") {
 		return nil
 	}
 	// rewrite import path

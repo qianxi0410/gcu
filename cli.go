@@ -3,9 +3,11 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/briandowns/spinner"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/urfave/cli/v2"
 )
@@ -110,7 +112,7 @@ func gcuCmd(ctx *cli.Context) error {
 
 	if ctx.Bool("all") {
 		for _, v := range versions {
-			if err := upgrade(v.path, v.new, ctx.String("modfiles"), ctx.Bool("rewrite")); err != nil {
+			if err := upgrade(v.path, v.new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe")); err != nil {
 				return err
 			}
 		}
@@ -144,11 +146,19 @@ func gcuCmd(ctx *cli.Context) error {
 		return err
 	}
 
+	s := spinner.New(spinner.CharSets[0], 100*time.Millisecond)
+	s.Prefix = "Updating... Please wait."
+	if err := s.Color("cyan"); err != nil {
+		return err
+	}
+
+	s.Start()
 	for _, idx := range idxs {
 		if err := upgrade(versions[idx].path, versions[idx].new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe")); err != nil {
 			return err
 		}
 	}
+	s.Stop()
 	printAllDepLatest()
 
 	return nil
