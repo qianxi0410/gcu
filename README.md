@@ -17,11 +17,13 @@ warning:
 - If the major version of the library is discontinuous, the latest version may not be available (e.g. 1.0.0 -> 3.1.0 without v2)
 - Still Work In Progress
 
-download:
+install:
 
 ```bash
 go install github.com/qianxi0410/gcu@latest
 ```
+
+usage:
 
 ```bash
 > gcu help
