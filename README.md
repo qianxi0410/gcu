@@ -25,11 +25,8 @@ go install github.com/qianxi0410/gcu@latest
 
 usage:
 
-```bash
+```txt
 > gcu help
-
-NAME:
-   gcu (go-check-updates) - check for updates in go mod dependency
 
 USAGE:
    gcu (go-check-updates) [global options] command [command options] [arguments...]
@@ -46,5 +43,6 @@ GLOBAL OPTIONS:
    --rewrite, -w              Rewrite all dependencies to latest version in your project. (default: true)
    --safe                     Only minor and patch releases are checked and updated. (default: false)
    --size value               Number of items to show in the select list. (default: 10)
+   --tidy, -t                 Tidy up your go.mod working file. (default: true)
    --help, -h                 show help (default: false)
 ```
