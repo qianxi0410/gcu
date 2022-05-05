@@ -74,6 +74,13 @@ func getVersions(ctx cli.Context) ([]version, error) {
 	wgCmd := &sync.WaitGroup{}
 	mu := &sync.Mutex{}
 
+	// before we get direct dependencies, we need to run go mod tidy ?
+	if ctx.Bool("tidy") {
+		if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
+			return nil, err
+		}
+	}
+
 	deps, err := direct(ctx.String("modfile"))
 	if err != nil {
 		return nil, err

@@ -112,7 +112,7 @@ func rewriteFile(name string, replace replaceFunc) error {
 	return os.Rename(tmp, name)
 }
 
-func upgrade(modp, v, dir string, r bool) error {
+func upgrade(modp, v, dir string, r, tidy bool) error {
 	newp := joinPath(modp, v, "")
 
 	// use go mod edit to update go.mod
@@ -142,10 +142,13 @@ func upgrade(modp, v, dir string, r bool) error {
 		return err
 	}
 
-	// after rewrite, we need to run go mod tidy to make sure go.mod is valid.
-	if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
-		return err
+	// after rewrite, we need to run go mod tidy to make sure go.mod is valid. ?
+	if tidy {
+		if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
+			return err
+		}
 	}
+	
 
 	return nil
 }

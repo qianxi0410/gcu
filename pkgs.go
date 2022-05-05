@@ -139,14 +139,3 @@ func direct(dir string) ([]module.Version, error) {
 	return mods, nil
 }
 
-func splitSpec(spec string) (path, query string) {
-	parts := strings.SplitN(spec, "@", 2)
-	if len(parts) == 2 {
-		path = parts[0]
-		query = parts[1]
-	} else {
-		path = spec
-	}
-
-	return
-}

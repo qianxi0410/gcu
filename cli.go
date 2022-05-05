@@ -57,6 +57,12 @@ func main() {
 				Usage: "Number of items to show in the select list.",
 				Value: 10,
 			},
+			&cli.BoolFlag{
+				Name: "tidy",
+				Aliases: []string{"t"},
+				Usage: "Tidy up your go.mod working file.",
+				Value: true,
+			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -124,7 +130,7 @@ func gcuCmd(ctx *cli.Context) error {
 
 		s.Start()
 		for _, v := range versions {
-			if err := upgrade(v.path, v.new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe")); err != nil {
+			if err := upgrade(v.path, v.new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 				return err
 			}
 		}
@@ -167,7 +173,7 @@ func gcuCmd(ctx *cli.Context) error {
 
 	s.Start()
 	for _, idx := range idxs {
-		if err := upgrade(versions[idx].path, versions[idx].new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe")); err != nil {
+		if err := upgrade(versions[idx].path, versions[idx].new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 			return err
 		}
 	}
