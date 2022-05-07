@@ -28,6 +28,9 @@ usage:
 ```txt
 > gcu help
 
+NAME:
+   gcu (go-check-updates) - check for updates in go mod dependency
+
 USAGE:
    gcu (go-check-updates) [global options] command [command options] [arguments...]
 
@@ -36,13 +39,12 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --modfile value, -m value  Path to go.mod file. (default: ".")
-   --stable, -s               Only fetch stable version. (default: true)
-   --cached, -c               Use cached version if available. (default: false)
-   --all, -a                  Upgrade all dependencies without asking. (default: false)
-   --rewrite, -w              Rewrite all dependencies to latest version in your project. (default: true)
-   --safe                     Only minor and patch releases are checked and updated. (default: false)
-   --size value               Number of items to show in the select list. (default: 10)
-   --tidy, -t                 Tidy up your go.mod working file. (default: true)
-   --help, -h                 show help (default: false)
+   --stable, -s   Only fetch stable version. (default: true)
+   --cached, -c   Use cached version if available. (default: false)
+   --all, -a      Upgrade all dependencies without asking. (default: false)
+   --rewrite, -w  Rewrite all dependencies to latest version in your project. (default: true)
+   --safe         Only minor and patch releases are checked and updated. (default: false)
+   --size value   Number of items to show in the select list. (default: 10)
+   --tidy, -t     Tidy up your go.mod working file. (default: true)
+   --help, -h     show help (default: false)
 ```
