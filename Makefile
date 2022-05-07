@@ -2,7 +2,7 @@ build:
 	go build .
 
 install:
-	rm gcu && go install .
+	go install .
 
 clean:
 	rm gcu
