@@ -8,6 +8,7 @@ But this tool makes up for these deficiencies.
 - Visual update selection
 - Colored version number distinguishing hints
 - Automatically rewrite import paths (default)
+- Support binary file upgrade written in go language (list display is currently not supported)
 
 warning:
 
