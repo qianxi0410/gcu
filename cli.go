@@ -21,7 +21,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name:  "gcu (go-check-updates)",
-		Usage: "check for updates in go mod dependency",
+		Usage: "check for updates in go.mod dependency and go's binary files",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "stable",

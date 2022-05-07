@@ -30,7 +30,7 @@ usage:
 > gcu help
 
 NAME:
-   gcu (go-check-updates) - check for updates in go mod dependency
+   gcu (go-check-updates) - check for updates in go.mod dependency and go's binary files
 
 USAGE:
    gcu (go-check-updates) [global options] command [command options] [arguments...]
