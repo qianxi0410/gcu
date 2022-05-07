@@ -46,5 +46,7 @@ GLOBAL OPTIONS:
    --safe         Only minor and patch releases are checked and updated. (default: false)
    --size value   Number of items to show in the select list. (default: 10)
    --tidy, -t     Tidy up your go.mod working file. (default: true)
+   --binary, -b   Check for updates in your binaries. (default: false)
+   --global, -g   Check for binaries updates in your global directory. (default: false)
    --help, -h     show help (default: false)
 ```
