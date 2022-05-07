@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -88,6 +89,7 @@ func splitPath(modprefix, pkgpath string) (modpath, pkgdir string, ok bool) {
 // findModFile recursively search the given path for a go.mod file.
 // only search up.
 func findModFile(dir string) (path string, err error) {
+	origin := dir
 	if dir, err = filepath.Abs(dir); err != nil {
 		return "", err
 	}
@@ -109,7 +111,7 @@ func findModFile(dir string) (path string, err error) {
 		dir = filepath.Dir(dir)
 	}
 
-	return "", os.ErrNotExist
+	return "", fmt.Errorf("file path error: %s", origin)
 }
 
 // direct returns the direct module deps.
@@ -138,4 +140,3 @@ func direct(dir string) ([]module.Version, error) {
 
 	return mods, nil
 }
-

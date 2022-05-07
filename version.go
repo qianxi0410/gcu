@@ -59,9 +59,9 @@ func (v *version) String(m1, m2, m3 int) string {
 	return fmt.Sprintf(format, v.path, v.oldversion(), v.newVersion())
 }
 
-func getVersions(ctx cli.Context) ([]version, error) {
+func getVersions(ctx cli.Context, fp string) ([]version, error) {
 	s := spinner.New(spinner.CharSets[36], 100*time.Millisecond)
-	s.Prefix = "Checking... Please wait."
+	s.Prefix = "Checking... Please wait.\t"
 	if err := s.Color("cyan"); err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func getVersions(ctx cli.Context) ([]version, error) {
 		}
 	}
 
-	deps, err := direct(ctx.String("modfile"))
+	deps, err := direct(fp)
 	if err != nil {
 		return nil, err
 	}

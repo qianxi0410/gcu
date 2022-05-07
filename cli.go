@@ -17,12 +17,6 @@ func main() {
 		Name:  "gcu (go-check-updates)",
 		Usage: "check for updates in go mod dependency",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "modfile",
-				Aliases: []string{"m"},
-				Usage:   "Path to go.mod file.",
-				Value:   ".",
-			},
 			&cli.BoolFlag{
 				Name:    "stable",
 				Aliases: []string{"s"},
@@ -58,10 +52,10 @@ func main() {
 				Value: 10,
 			},
 			&cli.BoolFlag{
-				Name: "tidy",
+				Name:    "tidy",
 				Aliases: []string{"t"},
-				Usage: "Tidy up your go.mod working file.",
-				Value: true,
+				Usage:   "Tidy up your go.mod working file.",
+				Value:   true,
 			},
 		},
 		Commands: []*cli.Command{
@@ -80,7 +74,12 @@ func main() {
 }
 
 func listCmd(ctx *cli.Context) error {
-	versions, err := getVersions(*ctx)
+	filePath := ctx.Args().First()
+	if filePath == "" {
+		filePath = "."
+	}
+
+	versions, err := getVersions(*ctx, filePath)
 	if err != nil {
 		return err
 	}
@@ -111,7 +110,12 @@ func (m MultiSelect) Cleanup(config *survey.PromptConfig, val interface{}) error
 }
 
 func gcuCmd(ctx *cli.Context) error {
-	versions, err := getVersions(*ctx)
+	filePath := ctx.Args().First()
+	if filePath == "" {
+		filePath = "."
+	}
+
+	versions, err := getVersions(*ctx, filePath)
 	if err != nil {
 		return err
 	}
@@ -130,7 +134,7 @@ func gcuCmd(ctx *cli.Context) error {
 
 		s.Start()
 		for _, v := range versions {
-			if err := upgrade(v.path, v.new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
+			if err := upgrade(v.path, v.new, filePath, ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 				return err
 			}
 		}
@@ -166,14 +170,14 @@ func gcuCmd(ctx *cli.Context) error {
 	}
 
 	s := spinner.New(spinner.CharSets[0], 100*time.Millisecond)
-	s.Prefix = "Updating... Please wait."
+	s.Prefix = "Updating... Please wait.\t"
 	if err := s.Color("cyan"); err != nil {
 		return err
 	}
 
 	s.Start()
 	for _, idx := range idxs {
-		if err := upgrade(versions[idx].path, versions[idx].new, ctx.String("modfile"), ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
+		if err := upgrade(versions[idx].path, versions[idx].new, filePath, ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 			return err
 		}
 	}
