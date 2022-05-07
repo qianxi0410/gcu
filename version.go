@@ -61,7 +61,7 @@ func (v *version) String(m1, m2, m3 int) string {
 
 func getVersions(ctx cli.Context, fp string) ([]version, error) {
 	s := spinner.New(spinner.CharSets[36], 100*time.Millisecond)
-	s.Prefix = "Checking... Please wait.\t"
+	s.Prefix = "Checking... Please wait.  "
 	if err := s.Color("cyan"); err != nil {
 		return nil, err
 	}

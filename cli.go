@@ -1,8 +1,14 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"log"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -56,6 +62,18 @@ func main() {
 				Aliases: []string{"t"},
 				Usage:   "Tidy up your go.mod working file.",
 				Value:   true,
+			},
+			&cli.BoolFlag{
+				Name:    "binary",
+				Aliases: []string{"b"},
+				Usage:   "Check for updates in your binaries.",
+				Value:   false,
+			},
+			&cli.BoolFlag{
+				Name:    "global",
+				Aliases: []string{"g"},
+				Usage:   "Check for binaries updates in your global directory.",
+				Value:   false,
 			},
 		},
 		Commands: []*cli.Command{
@@ -115,6 +133,18 @@ func gcuCmd(ctx *cli.Context) error {
 		filePath = "."
 	}
 
+	if ctx.Bool("binary") {
+		if ctx.Bool("global") {
+			filePath = filepath.Join(os.Getenv("GOPATH"), "bin")
+		}
+
+		if err := checkBinaries(filePath); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	versions, err := getVersions(*ctx, filePath)
 	if err != nil {
 		return err
@@ -127,20 +157,24 @@ func gcuCmd(ctx *cli.Context) error {
 
 	if ctx.Bool("all") {
 		s := spinner.New(spinner.CharSets[0], 100*time.Millisecond)
-		s.Prefix = "Updating... Please wait."
+		s.Prefix = "Updating... Please wait. "
 		if err := s.Color("cyan"); err != nil {
 			return err
 		}
 
 		s.Start()
+
+		func() {
+			s.Stop()
+			printAllLibLatest()
+		}()
+
 		for _, v := range versions {
 			if err := upgrade(v.path, v.new, filePath, ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 				return err
 			}
 		}
-		s.Stop()
 
-		printAllDepLatest()
 		return nil
 	}
 
@@ -170,19 +204,69 @@ func gcuCmd(ctx *cli.Context) error {
 	}
 
 	s := spinner.New(spinner.CharSets[0], 100*time.Millisecond)
-	s.Prefix = "Updating... Please wait.\t"
+	s.Prefix = "Updating... Please wait. "
 	if err := s.Color("cyan"); err != nil {
 		return err
 	}
 
 	s.Start()
+
+	func() {
+		s.Stop()
+		printPartDepLatest()
+	}()
+
 	for _, idx := range idxs {
 		if err := upgrade(versions[idx].path, versions[idx].new, filePath, ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 			return err
 		}
 	}
-	s.Stop()
-	printPartDepLatest()
+
+	return nil
+}
+
+func checkBinaries(fp string) error {
+	s := spinner.New(spinner.CharSets[0], 100*time.Millisecond)
+	s.Prefix = "Updating... Please wait. "
+	if err := s.Color("cyan"); err != nil {
+		return err
+	}
+
+	s.Start()
+
+	defer func() {
+		s.Stop()
+		printAllLibLatest()
+	}()
+
+	output, err := exec.Command("go", "version", "-m", fp).Output()
+	if err != nil {
+		return err
+	}
+
+	scanner := bufio.NewScanner(bytes.NewReader(output))
+	paths := make([]string, 0)
+	wg := sync.WaitGroup{}
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "path") {
+			path := strings.SplitN(line, "\t", 2)[1]
+			paths = append(paths, path)
+
+		}
+	}
+
+	wg.Add(len(paths))
+
+	for _, path := range paths {
+		go func(path string) {
+			defer wg.Done()
+			exec.Command("go", "install", path+"@latest").Run()
+		}(path)
+	}
+
+	wg.Wait()
 
 	return nil
 }

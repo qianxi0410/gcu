@@ -9,6 +9,11 @@ func printAllDepLatest() {
 	c.Println("🎉 All the latest dependencies!")
 }
 
+func printAllLibLatest() {
+	c := color.New(color.FgCyan, color.Bold)
+	c.Println("🎉 All the latest libs!")
+}
+
 func printPartDepLatest() {
 	c := color.New(color.FgCyan, color.Bold)
 	c.Println("🎉 The dependencies you selected have been updated to the latest!")
