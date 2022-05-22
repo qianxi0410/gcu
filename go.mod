@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/jedib0t/go-pretty/v6 v6.3.1
 	github.com/stretchr/testify v1.7.1
-	github.com/urfave/cli/v2 v2.6.0
+	github.com/urfave/cli/v2 v2.7.1
 	golang.org/x/mod v0.5.1
 )
 
@@ -19,6 +19,7 @@ require (
 )
 
 require (
+	github.com/antzucaro/matchr v0.0.0-20210222213004-b04723ef80f0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
