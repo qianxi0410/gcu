@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -17,6 +18,8 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/urfave/cli/v2"
 )
+
+const gcuVersion = "0.1.0-dev"
 
 func main() {
 	app := &cli.App{
@@ -75,12 +78,23 @@ func main() {
 				Usage:   "Check for binaries updates in your global directory.",
 				Value:   false,
 			},
+			&cli.BoolFlag{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Print the version and exit",
+			},
 		},
 		Commands: []*cli.Command{
 			{
 				Name:   "list",
 				Usage:  "List all direct dependencies available for update",
 				Action: listCmd,
+			},
+			{
+				Name:    "version",
+				Usage:   "Print the version number of gcu",
+				Action:  versionCmd,
+				Aliases: []string{"v"},
 			},
 		},
 		Action: gcuCmd,
@@ -128,6 +142,10 @@ func (m MultiSelect) Cleanup(config *survey.PromptConfig, val interface{}) error
 }
 
 func gcuCmd(ctx *cli.Context) error {
+	if ctx.Bool("version") {
+		return versionCmd(ctx)
+	}
+
 	filePath := ctx.Args().First()
 	if filePath == "" {
 		filePath = "."
@@ -268,5 +286,10 @@ func checkBinaries(fp string) error {
 
 	wg.Wait()
 
+	return nil
+}
+
+func versionCmd(_ *cli.Context) error {
+	fmt.Printf("gcu: %s\n", gcuVersion)
 	return nil
 }

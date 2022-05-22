@@ -36,8 +36,9 @@ USAGE:
    gcu (go-check-updates) [global options] command [command options] [arguments...]
 
 COMMANDS:
-   list     List all direct dependencies available for update
-   help, h  Shows a list of commands or help for one command
+   list        List all direct dependencies available for update
+   version, v  Print the version number of gcu
+   help, h     Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --stable, -s   Only fetch stable version. (default: true)
@@ -49,5 +50,6 @@ GLOBAL OPTIONS:
    --tidy, -t     Tidy up your go.mod working file. (default: true)
    --binary, -b   Check for updates in your binaries. (default: false)
    --global, -g   Check for binaries updates in your global directory. (default: false)
+   --version, -v  Print the version and exit (default: false)
    --help, -h     show help (default: false)
 ```
