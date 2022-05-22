@@ -45,11 +45,33 @@ GLOBAL OPTIONS:
    --cached, -c   Use cached version if available. (default: false)
    --all, -a      Upgrade all dependencies without asking. (default: false)
    --rewrite, -w  Rewrite all dependencies to latest version in your project. (default: true)
-   --safe         Only minor and patch releases are checked and updated. (default: false)
-   --size value   Number of items to show in the select list. (default: 10)
-   --tidy, -t     Tidy up your go.mod working file. (default: true)
-   --binary, -b   Check for updates in your binaries. (default: false)
-   --global, -g   Check for binaries updates in your global directory. (default: false)
+
+gcu on  master [!⇡] via  v1.18.1 
+> go install .
+
+gcu on  master [!⇡] via  v1.18.1 
+> gcu help    
+NAME:
+   gcu (go-check-updates) - check for updates in go.mod dependency and go's binary files
+
+USAGE:
+   gcu (go-check-updates) [global options] command [command options] [arguments...]
+
+COMMANDS:
+   list        List all direct dependencies available for update
+   version, v  Print the version number of gcu
+   help, h     Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --stable, -s   Only fetch stable version (default: true)
+   --cached, -c   Use cached version if available (default: false)
+   --all, -a      Upgrade all dependencies without asking (default: false)
+   --rewrite, -w  Rewrite all dependencies to latest version in your project (default: true)
+   --safe         Only minor and patch releases are checked and updated (default: false)
+   --size value   Number of items to show in the select list (default: 10)
+   --tidy, -t     Tidy up your go.mod working file (default: true)
+   --binary, -b   Check for updates in your binaries (default: false)
+   --global, -g   Check for binaries updates in your global directory (default: false)
    --version, -v  Print the version and exit (default: false)
    --help, -h     show help (default: false)
 ```
