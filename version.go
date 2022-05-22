@@ -77,7 +77,7 @@ func getVersions(ctx cli.Context, fp string) ([]version, error) {
 	// before we get direct dependencies, we need to run go mod tidy ?
 	if ctx.Bool("tidy") {
 		if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
-			return nil, err
+			return nil, errCanNotFindGoModFile
 		}
 	}
 

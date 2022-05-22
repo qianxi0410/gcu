@@ -41,28 +41,6 @@ COMMANDS:
    help, h     Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --stable, -s   Only fetch stable version. (default: true)
-   --cached, -c   Use cached version if available. (default: false)
-   --all, -a      Upgrade all dependencies without asking. (default: false)
-   --rewrite, -w  Rewrite all dependencies to latest version in your project. (default: true)
-
-gcu on  master [!⇡] via  v1.18.1 
-> go install .
-
-gcu on  master [!⇡] via  v1.18.1 
-> gcu help    
-NAME:
-   gcu (go-check-updates) - check for updates in go.mod dependency and go's binary files
-
-USAGE:
-   gcu (go-check-updates) [global options] command [command options] [arguments...]
-
-COMMANDS:
-   list        List all direct dependencies available for update
-   version, v  Print the version number of gcu
-   help, h     Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
    --stable, -s   Only fetch stable version (default: true)
    --cached, -c   Use cached version if available (default: false)
    --all, -a      Upgrade all dependencies without asking (default: false)
