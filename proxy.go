@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -87,7 +88,14 @@ func query(modp string, cached bool) (*Module, bool, error) {
 		return nil, false, err
 	}
 
-	url := fmt.Sprintf("https://proxy.golang.org/%s/@v/list", escaped)
+	// get goproxy env
+	proxy := os.Getenv("GOPROXY")
+	if proxy == "" {
+		proxy = "https://proxy.golang.org,direct"
+	}
+
+	site := strings.Split(proxy, ",")[0]
+	url := fmt.Sprintf("%s/%s/@v/list", site, escaped)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, false, err
