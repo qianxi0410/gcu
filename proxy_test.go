@@ -49,7 +49,7 @@ func TestQuery(t *testing.T) {
 	assert.True(t, ok)
 	t.Logf("query: %s, %v", mod.Path, mod.maxVersion("", true))
 
-	mod, ok, err = query("github.com/labstack/echo/v5", true)
+	_, ok, err = query("github.com/labstack/echo/v5", true)
 	assert.Nil(t, err)
 	assert.False(t, ok)
 }
