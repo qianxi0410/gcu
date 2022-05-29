@@ -1,8 +1,8 @@
 build:
 	go build .
 
-install: build
+install:
 	go install .
 
-clean: install
+clean: build
 	rm gcu
