@@ -54,16 +54,14 @@ func gcuCmd(ctx *cli.Context) error {
 
 		s.Start()
 
-		func() {
-			s.Stop()
-			printAllLibLatest()
-		}()
-
 		for _, v := range versions {
 			if err := upgrade(v.path, v.new, filePath, ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 				return err
 			}
 		}
+
+		s.Stop()
+		printAllDepLatest()
 
 		return nil
 	}
@@ -101,22 +99,15 @@ func gcuCmd(ctx *cli.Context) error {
 
 	s.Start()
 
-	func() {
-		s.Stop()
-		printPartDepLatest()
-	}()
-
 	for _, idx := range idxs {
 		if err := upgrade(versions[idx].path, versions[idx].new, filePath, ctx.Bool("rewrite") && !ctx.Bool("safe"), ctx.Bool("tidy")); err != nil {
 			return err
 		}
 	}
 
-	return nil
-}
+	s.Stop()
+	printPartDepLatest()
 
-func versionCmd(_ *cli.Context) error {
-	fmt.Printf("gcu: %s\n", gcuVersion)
 	return nil
 }
 
@@ -145,5 +136,10 @@ func listCmd(ctx *cli.Context) error {
 
 	t.Render()
 
+	return nil
+}
+
+func versionCmd(_ *cli.Context) error {
+	fmt.Printf("gcu(go check updates): %s\n", gcuVersion)
 	return nil
 }
